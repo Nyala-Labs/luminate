@@ -16,7 +16,8 @@ export type CurrentUser = {
   roleTitles: string[];
 };
 
-export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
+// Internal function to bypass cache
+async function fetchUserFromDb(): Promise<CurrentUser | null> {
   const supabase = await createClient();
   const { data: { user: authUser } } = await supabase.auth.getUser();
 
@@ -36,27 +37,28 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     .from(users)
     .leftJoin(userRoles, eq(users.id, userRoles.userId))
     .leftJoin(roles, eq(userRoles.roleId, roles.id))
-    .where(and(eq(users.email, authUser.email), isNull(users.deletedAt)))
-    .limit(1);
+    .where(and(eq(users.email, authUser.email), isNull(users.deletedAt)));
 
   if (result.length === 0) return null;
 
-  const row = result[0];
   return {
-    id: row.id,
-    email: row.email,
-    firstname: row.firstname,
-    lastname: row.lastname,
-    profilePic: row.profilePic,
-    status: row.status,
-    lastSignedIn: row.lastSignedIn ? new Date(row.lastSignedIn) : null,
+    id: result[0].id,
+    email: result[0].email,
+    firstname: result[0].firstname,
+    lastname: result[0].lastname,
+    profilePic: result[0].profilePic,
+    status: result[0].status,
+    lastSignedIn: result[0].lastSignedIn ? new Date(result[0].lastSignedIn) : null,
     roleTitles: result.map((r: any) => r.roleTitle).filter(Boolean) as string[],
   };
+}
+
+export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
+  return fetchUserFromDb();
 });
 
-
 export async function requireAuth(): Promise<CurrentUser> {
-  const currentUser = await getCurrentUser();
+  const currentUser = await fetchUserFromDb();
   if (!currentUser) {
     redirect('/auth/login');
   }
@@ -64,7 +66,7 @@ export async function requireAuth(): Promise<CurrentUser> {
 }
 
 export async function hasRole(roleTitle: string): Promise<boolean> {
-  const currentUser = await getCurrentUser();
+  const currentUser = await fetchUserFromDb();
   if (!currentUser) return false;
   return currentUser.roleTitles.includes(roleTitle);
 }
