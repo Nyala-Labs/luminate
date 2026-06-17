@@ -37,7 +37,7 @@ import { searchUsers, submitAward } from "@/app/dashboard/recognition/actions";
 const TIER_CONFIG = {
   SPARK: { points: 5, label: "Spark", approvalRequired: false },
   HELPER: { points: 25, label: "Helper", approvalRequired: false },
-  BUILDER: { points: 100, approvalRequired: true },
+  BUILDER: { points: 100, label: "" approvalRequired: true },
   CATALYST: { points: 225, approvalRequired: true },
   ARCHITECT: { points: 400, approvalRequired: true },
   LUMINARY: { points: 600, approvalRequired: true },
@@ -109,7 +109,9 @@ export function RecognitionAwardModal({
                 <Command>
                   <CommandInput
                     placeholder="Type to search..."
-                    onValueChange={handleSearch}
+                    onValueChange={(val) => {
+                      handleSearch(val);
+                    }}
                   />
                   <CommandList>
                     {loading && (
@@ -121,30 +123,33 @@ export function RecognitionAwardModal({
                     {!loading && users.length === 0 && (
                       <CommandEmpty>No users found.</CommandEmpty>
                     )}
-                    <CommandGroup>
-                      {users.map((user) => (
-                        <CommandItem
-                          key={user.id}
-                          onSelect={() => {
-                            setSelectedUser(user);
-                            setUserOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              selectedUser?.id === user.id
-                                ? "opacity-100"
-                                : "opacity-0",
-                            )}
-                          />
-                          {user.firstname} {user.lastname}{" "}
-                          <span className="ml-2 text-zinc-500 text-xs">
-                            ({user.email})
-                          </span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
+                    {!loading && users.length > 0 && (
+                      <CommandGroup>
+                        {users.map((user) => (
+                          <CommandItem
+                            key={user.id}
+                            value={`${user.firstname} ${user.lastname} ${user.email}`}
+                            onSelect={() => {
+                              setSelectedUser(user);
+                              setUserOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                selectedUser?.id === user.id
+                                  ? "opacity-100"
+                                  : "opacity-0",
+                              )}
+                            />
+                            {user.firstname} {user.lastname}{" "}
+                            <span className="ml-2 text-zinc-500 text-xs">
+                              ({user.email})
+                            </span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    )}
                   </CommandList>
                 </Command>
               </PopoverContent>
@@ -182,14 +187,14 @@ export function RecognitionAwardModal({
                 <SelectTrigger className="bg-zinc-900 w-full mt-2 h-12 border-zinc-800 text-zinc-200">
                   <SelectValue placeholder="Select Tier" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-900 p-2 border-zinc-800">
+                <SelectContent className="bg-zinc-900 border-zinc-800">
                   {Object.entries(TIER_CONFIG).map(([key, t]: any) => (
                     <SelectItem
                       key={key}
                       value={key}
                       className="text-zinc-200 focus:bg-zinc-800"
                     >
-                      <div className="flex justify-between items-center w-full">
+                      <div className="flex justify-between items-center w-full min-w-[200px]">
                         <span>{t.label}</span>
                         <span className="text-xs text-zinc-500">
                           {t.points} pts
