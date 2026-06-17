@@ -1,11 +1,22 @@
-// Disable prefetch as it is not supported for "Transaction" pool mode (used heavily in serverless/nextjs)
+
+
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema';
 
-const client = typeof window === 'undefined'
-  ? postgres(process.env.DATABASE_URL!, { prepare: false })
-  : null;
+// Create a singleton instance to reuse the connection pool across requests
+const globalForDb = globalThis as unknown as {
+  conn: postgres.Sql<{}> | undefined;
+};
 
-export const db = client ? drizzle(client, { schema }) : ({} as any);
+const conn = globalForDb.conn ?? postgres(process.env.DATABASE_URL!, {
+  prepare: false,
+  max: 10, // Limit pool size to stay under Supabase limits
+  idle_timeout: 20, // Close idle connections faster
+});
+
+if (process.env.NODE_ENV !== 'production') globalForDb.conn = conn;
+
+export const db = drizzle(conn, { schema });
+
 
