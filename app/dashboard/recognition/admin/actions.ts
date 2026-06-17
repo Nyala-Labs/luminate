@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth/server";
 
 export async function processAward(awardId: string, status: 'approved' | 'rejected') {
-  await requireRole("Executive Level");
+  await requireRole("Executive");
 
   await db
     .update(awards)
