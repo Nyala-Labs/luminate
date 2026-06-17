@@ -37,10 +37,10 @@ import { searchUsers, submitAward } from "@/app/dashboard/recognition/actions";
 const TIER_CONFIG = {
   SPARK: { points: 5, label: "Spark", approvalRequired: false },
   HELPER: { points: 25, label: "Helper", approvalRequired: false },
-  BUILDER: { points: 100, label: "" approvalRequired: true },
-  CATALYST: { points: 225, approvalRequired: true },
-  ARCHITECT: { points: 400, approvalRequired: true },
-  LUMINARY: { points: 600, approvalRequired: true },
+  BUILDER: { points: 100, label: "Builder", approvalRequired: true },
+  CATALYST: { points: 225, label: "Catalyst", approvalRequired: true },
+  ARCHITECT: { points: 400, label: "Architect", approvalRequired: true },
+  LUMINARY: { points: 600, label: "Luminary", approvalRequired: true },
 };
 
 export function RecognitionAwardModal({
