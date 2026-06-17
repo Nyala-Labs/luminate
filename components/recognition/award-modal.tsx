@@ -30,7 +30,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { searchUsers, submitAward } from "@/app/dashboard/recognition/actions";
 
@@ -70,55 +70,94 @@ export function RecognitionAwardModal({ children }: { children: React.ReactNode 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md bg-zinc-950 border border-zinc-800">
+      <DialogContent className="sm:max-w-xl bg-zinc-950 border border-zinc-800">
         <DialogHeader>
-          <DialogTitle className="text-zinc-100">Award Recognition</DialogTitle>
+          <DialogTitle className="text-zinc-100 text-xl font-bold">New Recognition</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          <Popover open={userOpen} onOpenChange={setUserOpen}>
-            <PopoverTrigger>
-              <Button variant="outline" className="w-full justify-between bg-zinc-900 border-zinc-800 text-zinc-400">
-                {selectedUser ? `${selectedUser.firstname} ${selectedUser.lastname}` : "Select teammate..."}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-full p-0 bg-zinc-900 border-zinc-800">
-              <Command>
-                <CommandInput placeholder="Search teammate..." onValueChange={handleSearch} />
-                <CommandList>
-                  <CommandEmpty>No users found.</CommandEmpty>
-                  <CommandGroup>
-                    {users.map((user) => (
-                      <CommandItem key={user.id} onSelect={() => { setSelectedUser(user); setUserOpen(false); }}>
-                        <Check className={cn("mr-2 h-4 w-4", selectedUser?.id === user.id ? "opacity-100" : "opacity-0")} />
-                        {user.firstname} {user.lastname}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
 
-          <Select value={tier} onValueChange={(value: string | null) => value && setTier(value)}>
-            <SelectTrigger className="bg-zinc-900 border-zinc-800 text-zinc-400">
-              <SelectValue placeholder="Select Tier" />
-            </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-zinc-800">
-              {Object.entries(TIER_CONFIG).map(([key, t]: any) => (
-                <SelectItem key={key} value={key}>
-                  {t.label} ({t.points} pts)
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Textarea 
-            placeholder="Justification (min 50 chars)..." 
-            className="bg-zinc-900 border-zinc-800 text-zinc-200"
-            value={justification}
-            onChange={(e) => setJustification(e.target.value)}
-          />
-          <Button className="w-full" onClick={handleSubmit} disabled={justification.length < 50 || !selectedUser || !tier}>
+        <div className="space-y-6 py-4">
+          {/* User Selection Section */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-zinc-500 uppercase">Recipient</label>
+            <Popover open={userOpen} onOpenChange={setUserOpen}>
+              <PopoverTrigger>
+                <Button variant="outline" className="w-full justify-between bg-zinc-900 border-zinc-800 text-zinc-400 h-12">
+                  {selectedUser ? `${selectedUser.firstname} ${selectedUser.lastname}` : "Search for a teammate..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[480px] p-0 bg-zinc-900 border-zinc-800">
+                <Command>
+                  <CommandInput placeholder="Type to search..." onValueChange={handleSearch} />
+                  <CommandList>
+                    <CommandEmpty>No users found.</CommandEmpty>
+                    <CommandGroup>
+                      {users.map((user) => (
+                        <CommandItem key={user.id} onSelect={() => { setSelectedUser(user); setUserOpen(false); }}>
+                          <Check className={cn("mr-2 h-4 w-4", selectedUser?.id === user.id ? "opacity-100" : "opacity-0")} />
+                          {user.firstname} {user.lastname} <span className="ml-2 text-zinc-500 text-xs">({user.email})</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+
+            {/* Profile Summary */}
+            {selectedUser && (
+              <div className="flex items-center gap-4 p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl mt-2 animate-in fade-in duration-300">
+                <div className="size-12 rounded-full bg-gradient-to-tr from-rose-500 to-purple-500 flex items-center justify-center text-lg font-bold text-white shrink-0">
+                  {selectedUser.firstname[0]}{selectedUser.lastname[0]}
+                </div>
+                <div>
+                  <p className="font-semibold text-zinc-100">{selectedUser.firstname} {selectedUser.lastname}</p>
+                  <p className="text-xs text-zinc-500">{selectedUser.email}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Details Section */}
+          <div className="grid grid-cols-2 gap-4">
+             <div className="space-y-2 col-span-2">
+                <label className="text-xs font-semibold text-zinc-500 uppercase">Recognition Tier</label>
+                <Select value={tier} onValueChange={(value: string | null) => value && setTier(value)}>
+                  <SelectTrigger className="bg-zinc-900 h-12 border-zinc-800 text-zinc-200">
+                    <SelectValue placeholder="Select Tier" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-900 p-2 border-zinc-800">
+                    {Object.entries(TIER_CONFIG).map(([key, t]: any) => (
+                      <SelectItem key={key} value={key} className="text-zinc-200 focus:bg-zinc-800">
+                        <div className="flex justify-between items-center w-full">
+                          <span>{t.label}</span>
+                          <span className="text-xs text-zinc-500">{t.points} pts</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+             </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-zinc-500 uppercase">Justification</label>
+            <Textarea 
+              placeholder="What did they do? Be specific about their impact..." 
+              className="bg-zinc-900 min-h-[120px] resize-none border-zinc-800 text-zinc-200"
+              value={justification}
+              onChange={(e) => setJustification(e.target.value)}
+            />
+            <p className={cn("text-[10px]", justification.length < 50 ? "text-rose-500" : "text-emerald-500")}>
+              {justification.length} / 50 characters minimum
+            </p>
+          </div>
+
+          <Button 
+            className="w-full h-12 font-bold bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500" 
+            onClick={handleSubmit} 
+            disabled={justification.length < 50 || !selectedUser || !tier}
+          >
             Submit Award
           </Button>
         </div>
