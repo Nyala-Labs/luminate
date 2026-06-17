@@ -33,37 +33,58 @@ export default async function RecognitionPage() {
   return (
     <div className="space-y-8 pb-12">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* ... header code ... */}
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight text-white">
+            Recognition
+          </h1>
+          <p className="text-sm text-zinc-400">
+            Award peers and build your Nyala reputation.
+          </p>
+        </div>
+        <RecognitionAwardModal>
+          <Button>Award Someone</Button>
+        </RecognitionAwardModal>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-8">
         {/* Received Awards */}
         <div className="bg-[#13151A]/30 border border-zinc-800/30 rounded-2xl p-6">
           <h3 className="text-base font-bold text-white mb-6">Received Awards</h3>
           {receivedAwards.length === 0 ? (
             <p className="text-sm text-zinc-500">No awards received yet.</p>
           ) : (
-            <div className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {receivedAwards.map((award) => (
-                <div key={award.id} className="p-4 bg-zinc-900/50 rounded-xl border border-zinc-800">
-                  <p className="text-sm font-semibold text-rose-300">{award.tierId} Award</p>
-                  <p className="text-xs text-zinc-400 mt-1">{award.justification}</p>
-                  <p className="text-[10px] text-zinc-500 mt-2">From: {award.giver.firstname} {award.giver.lastname}</p>
+                <div key={award.id} className="p-4 bg-zinc-900/50 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-colors">
+                  <p className="text-sm font-semibold text-rose-400">{award.tierId} Award</p>
+                  <p className="text-xs text-zinc-300 mt-2 line-clamp-2">{award.justification}</p>
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-zinc-800">
+                    <p className="text-[10px] text-zinc-500">From: {award.giver.firstname} {award.giver.lastname}</p>
+                    <span className="text-[10px] text-zinc-600">{new Date(award.createdAt).toLocaleDateString()}</span>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Sent/History */}
+        {/* Sent & Pending */}
         <div className="bg-[#13151A]/30 border border-zinc-800/30 rounded-2xl p-6">
           <h3 className="text-base font-bold text-white mb-6">Sent & Pending</h3>
-          {userAwards.filter(a => a.giverId === user.id).map(award => (
-             <div key={award.id} className="flex justify-between items-center p-3 text-sm border-b border-zinc-800/50">
-                <span>To {award.receiverId.slice(0,6)}...</span>
-                <span className="text-xs text-zinc-500 capitalize">{award.status}</span>
-             </div>
-          ))}
+          {userAwards.filter(a => a.giverId === user.id).length === 0 ? (
+            <p className="text-sm text-zinc-500">No awards sent yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {userAwards.filter(a => a.giverId === user.id).map(award => (
+                 <div key={award.id} className="flex justify-between items-center p-4 bg-zinc-900/30 rounded-lg border border-zinc-800/50">
+                    <span className="text-sm text-zinc-300">To {award.receiverId.slice(0,8)}...</span>
+                    <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded ${
+                      award.status === 'pending' ? 'bg-amber-500/10 text-amber-500' : 'bg-emerald-500/10 text-emerald-500'
+                    }`}>{award.status}</span>
+                 </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
