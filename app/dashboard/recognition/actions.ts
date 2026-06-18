@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { and, ne, ilike, or } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth/server";
-import { createAward } from "@/lib/recognition/service";
+import { createAward, TIER_CONFIG } from "@/lib/recognition/service";
 import { revalidatePath } from "next/cache";
 
 export async function searchUsers(query: string) {
@@ -32,7 +32,7 @@ export async function submitAward(formData: FormData) {
   if (!currentUser) throw new Error("Unauthorized");
 
   const receiverId = formData.get("receiverId") as string;
-  const tierId = formData.get("tierId") as string;
+  const tierId = formData.get("tierId") as keyof typeof TIER_CONFIG;
   const justification = formData.get("justification") as string;
 
   if (!receiverId || !tierId || justification.length < 50) {

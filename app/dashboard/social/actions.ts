@@ -15,7 +15,7 @@ export async function createPost(ownerId: string) {
     .values({ ownerId })
     .returning();
   
-  revalidateTag('social-posts');
+  revalidateTag('social-posts', {});
   redirect(`/dashboard/social/${newPost.id}`);
 }
 

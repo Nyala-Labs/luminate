@@ -20,7 +20,7 @@ const formSchema = z.object({
     description: z.string().min(1, "Description is required"),
     amount: z.string().min(1, "Amount is required"),
     category: z.enum(["Event", "Miscellaneous", "Asset", "Operational"], {
-      errorMap: () => ({ message: "Please select a valid category" }),
+      message: "Please select a valid category",
     }),
   })).min(1, "At least one item is required"),
 });

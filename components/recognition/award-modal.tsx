@@ -69,7 +69,7 @@ export function RecognitionAwardModal({
 
   const handleSubmit = async () => {
     const formData = new FormData();
-    formData.append("receiverId", selectedUser?.id);
+    formData.append("receiverId", selectedUser?.id ?? "");
     formData.append("tierId", tier);
     formData.append("justification", justification);
     await submitAward(formData);

@@ -17,7 +17,7 @@ const createClaimSchema = z.object({
   description: z.string().optional(),
   items: z.array(z.object({
     description: z.string().min(1, "Item description is required"),
-    amount: z.string().transform(val => parseFloat(val)).refine(val => !isNaN(val), "Amount must be a number"),
+    amount: z.string().min(1, "Amount is required"),
     category: z.string().min(1, "Category is required"),
   })).min(1, "At least one item is required"),
 });
@@ -34,7 +34,7 @@ export async function createClaim(data: z.infer<typeof createClaimSchema>) {
   }
 
   const { title, description, items } = result.data;
-  const totalAmount = items.reduce((sum, item) => sum + item.amount, 0);
+  const totalAmount = items.reduce((sum, item) => sum + parseFloat(item.amount), 0);
 
   try {
     let claimId: string;
@@ -55,7 +55,7 @@ export async function createClaim(data: z.infer<typeof createClaimSchema>) {
           items.map(item => ({
             claimId: newClaim.id,
             description: item.description,
-            amount: item.amount.toString(),
+            amount: parseFloat(item.amount).toString(),
             category: item.category,
           }))
         );
