@@ -87,3 +87,36 @@ export const reputationLedger = pgTable('reputation_ledger', {
   actionType: text('action_type'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+export const socialAccounts = pgTable('social_accounts', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id).notNull(),
+  platform: text('platform').notNull(), // 'instagram' | 'linkedin' | 'facebook' | 'tiktok' | 'xhs'
+  accessToken: text('access_token').notNull(),
+  refreshToken: text('refresh_token'),
+  expiresAt: timestamp('expires_at'),
+});
+
+export const socialPosts = pgTable('social_posts', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  ownerId: uuid('owner_id').references(() => users.id).notNull(),
+  status: text('status').default('draft').notNull(), // 'draft' | 'scheduled' | 'published' | 'failed'
+  scheduledAt: timestamp('scheduled_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const postMedia = pgTable('post_media', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  postId: uuid('post_id').references(() => socialPosts.id, { onDelete: 'cascade' }).notNull(),
+  driveFileId: text('drive_file_id').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const postPlatformContent = pgTable('post_platform_content', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  postId: uuid('post_id').references(() => socialPosts.id, { onDelete: 'cascade' }).notNull(),
+  platform: text('platform').notNull(),
+  caption: text('caption'),
+  status: text('status').default('pending').notNull(), // 'pending' | 'posted' | 'failed'
+});
+

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/utils/supabase/client";
 import {
   Tooltip,
   TooltipContent,
@@ -14,10 +15,12 @@ import {
   ChevronsRight,
   LayoutDashboard,
   Award,
+  Share2,
+  LogOut,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
 import logo from "@/public/nyalalabs.svg";
 
@@ -39,6 +42,13 @@ interface DashboardSidebarProps {
 export function DashboardSidebar({ user }: DashboardSidebarProps) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const supabase = createClient();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    await router.push("/");
+  };
 
   const initials =
     `${user.firstname?.[0] || ""}${user.lastname?.[0] || ""}`.toUpperCase() ||
@@ -52,6 +62,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       items: [
         { name: "Dashboard", href: "/dashboard/home", icon: LayoutDashboard },
         { name: "Recognition", href: "/dashboard/recognition", icon: Award },
+        { name: "Social Blaster", href: "/dashboard/social", icon: Share2 },
       ],
     },
   ];
@@ -155,6 +166,29 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
               </ul>
             </div>
           ))}
+        </TooltipProvider>
+      </div>
+
+      <div className="p-3 border-t border-sidebar-border">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <button
+                onClick={handleSignOut}
+                className={cn(
+                  "flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full text-sidebar-foreground/70 hover:bg-rose-500/10 hover:text-rose-500",
+                )}
+              >
+                <LogOut className="size-5 shrink-0" />
+                {!isCollapsed && (
+                  <span className="truncate flex-1 text-left">Logout</span>
+                )}
+              </button>
+            </TooltipTrigger>
+            {isCollapsed && (
+              <TooltipContent side="right">Logout</TooltipContent>
+            )}
+          </Tooltip>
         </TooltipProvider>
       </div>
 

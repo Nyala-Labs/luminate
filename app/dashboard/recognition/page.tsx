@@ -1,10 +1,13 @@
 import * as React from "react";
+import Link from "next/link";
 import { RecognitionAwardModal } from "@/components/recognition/award-modal";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth/server";
 import { db } from "@/db";
 import { awards, users } from "@/db/schema";
 import { or, eq, desc } from "drizzle-orm";
+import { AWARD_STATUSES } from "@/lib/config/recognition";
+import { AwardCard, StatusBadge } from "@/components/recognition/award-cards";
 
 export default async function RecognitionPage() {
   const user = await getCurrentUser();
@@ -51,9 +54,16 @@ export default async function RecognitionPage() {
             Award peers and build your Nyala reputation.
           </p>
         </div>
-        <RecognitionAwardModal>
-          <Button>Award Someone</Button>
-        </RecognitionAwardModal>
+        <div className="flex items-center gap-3">
+          {user.roleTitles.includes("Executive") && (
+            <Link href="/dashboard/recognition/admin">
+              <Button variant="outline">Admin Approvals</Button>
+            </Link>
+          )}
+          <RecognitionAwardModal>
+            <Button>Award Someone</Button>
+          </RecognitionAwardModal>
+        </div>
       </div>
 
       <div className="grid gap-8">
@@ -65,14 +75,13 @@ export default async function RecognitionPage() {
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {receivedAwards.map((award) => (
-                <div key={award.id} className="p-4 bg-zinc-900/50 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-colors">
-                  <p className="text-sm font-semibold text-rose-400">{award.tierId} Award</p>
-                  <p className="text-xs text-zinc-300 mt-2 line-clamp-2">{award.justification}</p>
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-zinc-800">
-                    <p className="text-[10px] text-zinc-500">From: {award.giver.firstname} {award.giver.lastname}</p>
-                    <span className="text-[10px] text-zinc-600">{new Date(award.createdAt).toLocaleDateString()}</span>
-                  </div>
-                </div>
+                <AwardCard 
+                  key={award.id}
+                  tierId={award.tierId}
+                  justification={award.justification}
+                  date={award.createdAt}
+                  from={`${award.giver.firstname} ${award.giver.lastname}`}
+                />
               ))}
             </div>
           )}
@@ -93,11 +102,7 @@ export default async function RecognitionPage() {
                       </div>
                       <span className="text-sm font-medium text-zinc-200">To {award.receiver.firstname} {award.receiver.lastname}</span>
                     </div>
-                    <span className={`text-[10px] font-bold uppercase px-3 py-1 rounded-full ${
-                      award.status === 'pending' ? 'bg-amber-500/10 text-amber-500' : 
-                      award.status === 'rejected' ? 'bg-rose-500/10 text-rose-500' :
-                      'bg-emerald-500/10 text-emerald-500'
-                    }`}>{award.status}</span>
+                    <StatusBadge status={award.status} />
                  </div>
               ))}
             </div>

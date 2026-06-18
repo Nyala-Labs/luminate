@@ -32,16 +32,8 @@ import {
 } from "@/components/ui/popover";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TIER_CONFIG } from "@/lib/config/recognition";
 import { searchUsers, submitAward } from "@/app/dashboard/recognition/actions";
-
-const TIER_CONFIG = {
-  SPARK: { points: 5, label: "Spark", approvalRequired: false },
-  HELPER: { points: 25, label: "Helper", approvalRequired: false },
-  BUILDER: { points: 100, label: "Builder", approvalRequired: true },
-  CATALYST: { points: 225, label: "Catalyst", approvalRequired: true },
-  ARCHITECT: { points: 400, label: "Architect", approvalRequired: true },
-  LUMINARY: { points: 600, label: "Luminary", approvalRequired: true },
-};
 
 export function RecognitionAwardModal({
   children,
