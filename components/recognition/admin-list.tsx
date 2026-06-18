@@ -4,8 +4,14 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { processAward } from "@/app/dashboard/recognition/admin/actions";
 
-export function RecognitionAdminList({ initialAwards }: { initialAwards: any[] }) {
-  const [awards, setAwards] = React.useState(initialAwards);
+interface Award {
+  id: string;
+  tierId: string;
+  justification: string;
+}
+
+export function RecognitionAdminList({ initialAwards }: { initialAwards: Award[] }) {
+  const [awards, setAwards] = React.useState<Award[]>(initialAwards);
 
   const handleProcess = async (id: string, status: 'approved' | 'rejected') => {
     await processAward(id, status);
@@ -19,7 +25,7 @@ export function RecognitionAdminList({ initialAwards }: { initialAwards: any[] }
         <p className="text-sm text-zinc-500">No pending awards.</p>
       ) : (
         <div className="space-y-4">
-          {awards.map((award: any) => (
+          {awards.map((award: Award) => (
             <div key={award.id} className="p-4 border border-zinc-800/50 rounded-xl flex justify-between items-center">
               <div>
                 <p className="text-sm text-zinc-300 font-semibold">Award #{award.id.slice(0,8)} - {award.tierId}</p>

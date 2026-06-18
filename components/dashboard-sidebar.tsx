@@ -17,6 +17,9 @@ import {
   Award,
   Share2,
   LogOut,
+  ReceiptText,
+  UserCheck,
+  ShieldCheck,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -63,6 +66,9 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
         { name: "Dashboard", href: "/dashboard/home", icon: LayoutDashboard },
         { name: "Recognition", href: "/dashboard/recognition", icon: Award },
         { name: "Social Blaster", href: "/dashboard/social", icon: Share2 },
+        { name: "Claims", href: "/dashboard/claims", icon: ReceiptText },
+        { name: "Treasurer Queue", href: "/dashboard/claims/treasurer", icon: UserCheck },
+        { name: "Executive Queue", href: "/dashboard/claims/executive", icon: ShieldCheck },
       ],
     },
   ];

@@ -49,7 +49,7 @@ async function fetchUserFromDb(): Promise<CurrentUser | null> {
     profilePic: result[0].profilePic,
     status: result[0].status,
     lastSignedIn: result[0].lastSignedIn ? new Date(result[0].lastSignedIn) : null,
-    roleTitles: result.map((r: any) => r.roleTitle).filter(Boolean) as string[],
+    roleTitles: result.map((r: { roleTitle: string | null }) => r.roleTitle).filter(Boolean) as string[],
   };
 }
 
@@ -68,12 +68,12 @@ export async function requireAuth(): Promise<CurrentUser> {
 export async function hasRole(roleTitle: string): Promise<boolean> {
   const currentUser = await fetchUserFromDb();
   if (!currentUser) return false;
-  return currentUser.roleTitles.includes(roleTitle);
+  return currentUser.roleTitles.some(r => r.toLowerCase() === roleTitle.toLowerCase());
 }
 
 export async function requireRole(roleTitle: string): Promise<CurrentUser> {
   const currentUser = await requireAuth();
-  if (!currentUser.roleTitles.includes(roleTitle)) {
+  if (!currentUser.roleTitles.some(r => r.toLowerCase() === roleTitle.toLowerCase())) {
     redirect('/403');
   }
   return currentUser;

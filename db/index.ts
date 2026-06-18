@@ -6,7 +6,7 @@ import * as schema from './schema';
 
 // Create a singleton instance to reuse the connection pool across requests
 const globalForDb = globalThis as unknown as {
-  conn: postgres.Sql<{}> | undefined;
+  conn: postgres.Sql<object> | undefined;
 };
 
 const conn = globalForDb.conn ?? postgres(process.env.DATABASE_URL!, {

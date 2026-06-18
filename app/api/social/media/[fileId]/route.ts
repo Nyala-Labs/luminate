@@ -28,7 +28,7 @@ export async function GET(
       { responseType: 'stream' }
     );
 
-    return new NextResponse(response.data as any, {
+    return new NextResponse(response.data as unknown as ReadableStream, {
       headers: {
         'Content-Type': response.headers['content-type'] || 'image/jpeg',
       },

@@ -3,6 +3,7 @@ import { Readable } from 'stream';
 import { google } from 'googleapis';
 
 const PARENT_FOLDER_ID = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID!;
+const CLAIMS_FOLDER_ID = process.env.GOOGLE_DRIVE_CLAIMS_FOLDER_ID!;
 
 function getDriveClient(accessToken: string) {
   const auth = new google.auth.OAuth2();
@@ -16,6 +17,21 @@ export async function createPostFolder(accessToken: string, postId: string) {
     name: `Post_${postId}`,
     mimeType: 'application/vnd.google-apps.folder',
     parents: [PARENT_FOLDER_ID],
+  };
+  
+  const folder = await drive.files.create({
+    requestBody: folderMetadata,
+    fields: 'id',
+  });
+  return folder.data.id;
+}
+
+export async function createClaimFolder(accessToken: string, claimId: string) {
+  const drive = getDriveClient(accessToken);
+  const folderMetadata = {
+    name: `Claim_${claimId}`,
+    mimeType: 'application/vnd.google-apps.folder',
+    parents: [CLAIMS_FOLDER_ID],
   };
   
   const folder = await drive.files.create({

@@ -35,6 +35,13 @@ import { cn } from "@/lib/utils";
 import { TIER_CONFIG } from "@/lib/config/recognition";
 import { searchUsers, submitAward } from "@/app/dashboard/recognition/actions";
 
+interface User {
+  id: string;
+  firstname: string | null;
+  lastname: string | null;
+  email: string;
+}
+
 export function RecognitionAwardModal({
   children,
 }: {
@@ -42,8 +49,8 @@ export function RecognitionAwardModal({
 }) {
   const [open, setOpen] = React.useState(false);
   const [userOpen, setUserOpen] = React.useState(false);
-  const [users, setUsers] = React.useState<any[]>([]);
-  const [selectedUser, setSelectedUser] = React.useState<any>(null);
+  const [users, setUsers] = React.useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
   const [tier, setTier] = React.useState<string>("");
   const [justification, setJustification] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -180,7 +187,7 @@ export function RecognitionAwardModal({
                   <SelectValue placeholder="Select Tier" />
                 </SelectTrigger>
                 <SelectContent className="bg-zinc-900 border-zinc-800">
-                  {Object.entries(TIER_CONFIG).map(([key, t]: any) => (
+                  {Object.entries(TIER_CONFIG).map(([key, t]) => (
                     <SelectItem
                       key={key}
                       value={key}

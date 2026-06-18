@@ -32,7 +32,7 @@ export async function submitAward(formData: FormData) {
   if (!currentUser) throw new Error("Unauthorized");
 
   const receiverId = formData.get("receiverId") as string;
-  const tierId = formData.get("tierId") as any;
+  const tierId = formData.get("tierId") as string;
   const justification = formData.get("justification") as string;
 
   if (!receiverId || !tierId || justification.length < 50) {

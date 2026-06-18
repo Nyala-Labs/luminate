@@ -1,7 +1,10 @@
-import { pgTable, serial, text, timestamp, uuid, pgEnum, primaryKey } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, uuid, pgEnum, primaryKey, numeric, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const statusEnum = pgEnum('status', ['PENDING', 'ACTIVE', 'REVOKED']);
+export const claimStatusEnum = pgEnum('claim_status', ['DRAFT', 'SUBMITTED', 'TREASURER_REVIEW', 'TREASURER_APPROVED', 'EXECUTIVE_REVIEW', 'APPROVED', 'PAID', 'CLOSED', 'REJECTED']);
+export const stageEnum = pgEnum('stage', ['treasurer', 'executive']);
+export const actionEnum = pgEnum('action', ['approved', 'rejected', 'forwarded']);
 
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -120,3 +123,78 @@ export const postPlatformContent = pgTable('post_platform_content', {
   status: text('status').default('pending').notNull(), // 'pending' | 'posted' | 'failed'
 });
 
+export const claims = pgTable('claims', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  title: text('title').notNull(),
+  description: text('description'),
+  submittedBy: uuid('submitted_by').references(() => users.id).notNull(),
+  totalAmount: numeric('total_amount').notNull(),
+  status: claimStatusEnum('status').default('DRAFT').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const claimItems = pgTable('claim_items', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  claimId: uuid('claim_id').references(() => claims.id, { onDelete: 'cascade' }).notNull(),
+  description: text('description').notNull(),
+  amount: numeric('amount').notNull(),
+  category: text('category').notNull(),
+  eventId: text('event_id'),
+});
+
+export const claimReceipts = pgTable('claim_receipts', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  claimId: uuid('claim_id').references(() => claims.id, { onDelete: 'cascade' }).notNull(),
+  driveFileId: text('drive_file_id').notNull(),
+  driveUrl: text('drive_url').notNull(),
+  uploadedBy: uuid('uploaded_by').references(() => users.id).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const claimApprovals = pgTable('claim_approvals', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  claimId: uuid('claim_id').references(() => claims.id, { onDelete: 'cascade' }).notNull(),
+  stage: stageEnum('stage').notNull(),
+  action: actionEnum('action').notNull(),
+  actorId: uuid('actor_id').references(() => users.id).notNull(),
+  comment: text('comment'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const auditLogs = pgTable('audit_logs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  entityType: text('entity_type').notNull(),
+  entityId: text('entity_id').notNull(),
+  action: text('action').notNull(),
+  oldValue: jsonb('old_value'),
+  newValue: jsonb('new_value'),
+  actorId: uuid('actor_id').references(() => users.id),
+  timestamp: timestamp('timestamp').defaultNow().notNull(),
+  ipAddress: text('ip_address'),
+});
+
+export const claimsRelations = relations(claims, ({ one, many }) => ({
+  submittedBy: one(users, { fields: [claims.submittedBy], references: [users.id] }),
+  items: many(claimItems),
+  receipts: many(claimReceipts),
+  approvals: many(claimApprovals),
+}));
+
+export const claimItemsRelations = relations(claimItems, ({ one }) => ({
+  claim: one(claims, { fields: [claimItems.claimId], references: [claims.id] }),
+}));
+
+export const claimReceiptsRelations = relations(claimReceipts, ({ one }) => ({
+  claim: one(claims, { fields: [claimReceipts.claimId], references: [claims.id] }),
+  uploadedBy: one(users, { fields: [claimReceipts.uploadedBy], references: [users.id] }),
+}));
+
+export const claimApprovalsRelations = relations(claimApprovals, ({ one }) => ({
+  claim: one(claims, { fields: [claimApprovals.claimId], references: [claims.id] }),
+  actor: one(users, { fields: [claimApprovals.actorId], references: [users.id] }),
+}));
+
+export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
+  actor: one(users, { fields: [auditLogs.actorId], references: [users.id] }),
+}));
