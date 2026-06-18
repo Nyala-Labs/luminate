@@ -100,3 +100,25 @@ XHS_CLIENT_SECRET='...'
      ALTER TABLE public.post_platform_content ENABLE ROW LEVEL SECURITY;
      ```
    - Define RLS policies (e.g., `CREATE POLICY "User can manage their own posts" ON social_posts ... USING (owner_id = auth.uid());`).
+
+## 7. Recognition System
+The recognition system allows team members to award points to colleagues based on their contributions, categorized by predefined tiers.
+
+### 7.1 Tier Configuration
+| Tier | Points | Approval Required |
+| :--- | :--- | :--- |
+| **SPARK** | 5 | No |
+| **HELPER** | 25 | No |
+| **BUILDER** | 100 | Yes |
+| **CATALYST** | 225 | Yes |
+| **ARCHITECT** | 400 | Yes |
+| **LUMINARY** | 600 | Yes |
+
+### 7.2 Awarding Flow
+1. **Creation**: A user submits an award via the UI, specifying the receiver, the tier, and a justification.
+2. **Processing**:
+   - If the selected tier does **not** require approval, the award status is automatically set to `approved` and points are credited immediately.
+   - If the tier **does** require approval, the status is set to `pending`, and it is added to the administrative moderation queue.
+3. **Approval**: Administrators review pending awards.
+4. **Finalization**: Once an award is approved, the system updates the recipient's record in the `reputationLedger` with the appropriate point value.
+

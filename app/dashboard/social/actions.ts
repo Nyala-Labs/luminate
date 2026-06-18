@@ -7,6 +7,7 @@ import { socialPosts, postMedia } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 
 export async function createPost(ownerId: string) {
   const [newPost] = await db
@@ -14,6 +15,7 @@ export async function createPost(ownerId: string) {
     .values({ ownerId })
     .returning();
   
+  revalidateTag('social-posts');
   redirect(`/dashboard/social/${newPost.id}`);
 }
 

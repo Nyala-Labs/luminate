@@ -1,6 +1,4 @@
-import { db } from "@/db";
-import { socialPosts } from "@/db/schema";
-import { desc } from "drizzle-orm";
+import { getCachedSocialPosts } from "@/lib/social/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -10,7 +8,7 @@ import { Share2 } from "lucide-react";
 
 export default async function SocialDashboardPage() {
   const user = await getCurrentUser();
-  const posts = await db.select().from(socialPosts).orderBy(desc(socialPosts.createdAt));
+  const posts = await getCachedSocialPosts();
 
   async function handleCreatePost() {
     "use server";

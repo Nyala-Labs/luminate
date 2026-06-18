@@ -19,6 +19,14 @@ export async function ContributionGallery() {
     .orderBy(desc(awards.createdAt))
     .limit(10);
 
+  if (latestAwards.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-32 w-full bg-zinc-900/50 rounded-xl border border-dashed border-zinc-800 p-5 text-center">
+        <p className="text-zinc-500 text-sm">No recent contributions yet.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
       {latestAwards.map((award) => {
