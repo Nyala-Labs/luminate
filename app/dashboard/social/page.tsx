@@ -36,7 +36,7 @@ export default async function SocialDashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-zinc-400">Status: {post.status}</p>
-                  <p className="text-zinc-500 text-sm">Created: {post.createdAt.toLocaleDateString()}</p>
+                  <p className="text-zinc-500 text-sm">Created: {new Date(post.createdAt).toLocaleDateString()}</p>
                 </CardContent>
               </Card>
             </Link>

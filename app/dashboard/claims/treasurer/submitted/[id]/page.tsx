@@ -3,15 +3,13 @@ import { claims, claimPayments } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { submitClaim, getClaimReceipts } from "../actions";
 import { getCurrentUser } from "@/lib/auth/server";
+import { getClaimReceipts } from "../../../actions";
 import { ReceiptGallery } from "@/components/claims/receipt-gallery";
-import { DeleteClaimButton } from "@/components/claims/delete-claim-button";
-import { SubmitClaimButton } from "@/components/claims/submit-claim-button";
+import { PaymentForm } from "@/components/claims/payment-form";
+import { ReviewControls } from "@/components/claims/review-controls";
 
-export default async function ClaimDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function TreasurerReviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const user = await getCurrentUser();
   const [claim] = await db.select().from(claims).where(eq(claims.id, id));
@@ -24,26 +22,25 @@ export default async function ClaimDetailPage({ params }: { params: Promise<{ id
     <div className="p-6 space-y-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>{claim.title}</CardTitle>
-          <div className="flex gap-2">
-            {claim.status === 'DRAFT' && (
-              <>
-                <Link href={`/dashboard/claims/${claim.id}/edit`}>
-                  <Button variant="outline">Edit</Button>
-                </Link>
-                <DeleteClaimButton claimId={claim.id} />
-                <SubmitClaimButton claimId={claim.id} />
-              </>
-            )}
-          </div>
+          <CardTitle>Review Claim: {claim.title}</CardTitle>
+          {(claim.status === "TREASURER_REVIEW" || claim.status === "SUBMITTED") && (
+            <ReviewControls claim={claim} userId={user!.id} />
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
           <p>Status: {claim.status}</p>
           <p>Total Amount: RM{claim.totalAmount}</p>
           <p>Description: {claim.description}</p>
           
-          <h3 className="font-semibold">Receipts</h3>
-          <ReceiptGallery receipts={receipts} canReview={false} />
+          <h3 className="font-semibold">Receipts (Click to Review)</h3>
+          <ReceiptGallery
+            receipts={receipts}
+            canReview={claim.status === "TREASURER_REVIEW" || claim.status === "SUBMITTED"}
+          />
+          
+          {claim.status === "WAITING_FOR_PAYMENT" && (
+            <PaymentForm claimId={claim.id} />
+          )}
 
           {payment && (
             <div className="mt-4">
@@ -58,4 +55,3 @@ export default async function ClaimDetailPage({ params }: { params: Promise<{ id
     </div>
   );
 }
-

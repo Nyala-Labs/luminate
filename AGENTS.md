@@ -15,3 +15,7 @@ Key known differences:
 - **Dev:** `bun dev`
 - **Lint:** `bun run lint`
 - **Build:** `bun run build`
+
+## Database
+- **Tool:** Drizzle ORM
+- **Commands:** `bun run db:generate`, `bun run db:push`, `bun run db:migrate`, `bun run db:studio`

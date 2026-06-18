@@ -2,7 +2,7 @@ import { pgTable, serial, text, timestamp, uuid, pgEnum, primaryKey, numeric, js
 import { relations } from 'drizzle-orm';
 
 export const statusEnum = pgEnum('status', ['PENDING', 'ACTIVE', 'REVOKED']);
-export const claimStatusEnum = pgEnum('claim_status', ['DRAFT', 'SUBMITTED', 'TREASURER_REVIEW', 'TREASURER_APPROVED', 'EXECUTIVE_REVIEW', 'APPROVED', 'PAID', 'CLOSED', 'REJECTED']);
+export const claimStatusEnum = pgEnum('claim_status', ['DRAFT', 'SUBMITTED', 'TREASURER_REVIEW', 'TREASURER_APPROVED', 'EXECUTIVE_REVIEW', 'APPROVED', 'WAITING_FOR_PAYMENT', 'PAID', 'CLOSED', 'REJECTED']);
 export const stageEnum = pgEnum('stage', ['treasurer', 'executive']);
 export const actionEnum = pgEnum('action', ['approved', 'rejected', 'forwarded']);
 
@@ -149,6 +149,18 @@ export const claimReceipts = pgTable('claim_receipts', {
   driveFileId: text('drive_file_id').notNull(),
   driveUrl: text('drive_url').notNull(),
   uploadedBy: uuid('uploaded_by').references(() => users.id).notNull(),
+  status: text('status').default('PENDING').notNull(),
+  rejectionReason: text('rejection_reason'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const claimPayments = pgTable('claim_payments', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  claimId: uuid('claim_id').references(() => claims.id, { onDelete: 'cascade' }).notNull(),
+  paidBy: uuid('paid_by').references(() => users.id).notNull(),
+  amount: numeric('amount').notNull(),
+  proofDriveFileId: text('proof_drive_file_id').notNull(),
+  proofDriveUrl: text('proof_drive_url').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

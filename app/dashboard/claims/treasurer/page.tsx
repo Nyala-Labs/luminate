@@ -1,42 +1,66 @@
 import { db } from "@/db";
 import { claims } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, or, inArray } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser, hasRole } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
-import { approveClaim } from "../actions";
+import Link from "next/link";
 
 export default async function TreasurerDashboardPage() {
   const user = await getCurrentUser();
   if (!user || !(await hasRole('treasurer'))) redirect('/dashboard');
 
-  const pendingClaims = await db.select().from(claims).where(eq(claims.status, 'SUBMITTED'));
+  const pendingClaims = await db.select().from(claims).where(or(eq(claims.status, 'TREASURER_REVIEW'), eq(claims.status, 'SUBMITTED')));
+  const waitingClaims = await db.select().from(claims).where(eq(claims.status, 'WAITING_FOR_PAYMENT'));
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Treasurer Dashboard</h1>
-      {pendingClaims.length === 0 ? (
-        <div className="flex items-center justify-center h-32 w-full bg-zinc-900/50 rounded-xl border border-dashed border-zinc-800 p-5 text-center">
-          <p className="text-zinc-500 text-sm">No pending claims for treasurer review.</p>
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {pendingClaims.map((claim) => (
-            <Card key={claim.id}>
-              <CardHeader>
-                <CardTitle>{claim.title} - RM{claim.totalAmount}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Submitted by: {claim.submittedBy}</p>
-                <form action={approveClaim.bind(null, claim.id, user.id, "Approved by Treasurer")}>
-                  <Button type="submit">Approve</Button>
-                </form>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+    <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-bold">Treasurer Dashboard</h1>
+      
+      <section>
+        <h2 className="text-xl font-semibold mb-4">Pending Review</h2>
+        {pendingClaims.length === 0 ? (
+          <p className="text-zinc-500">No pending claims.</p>
+        ) : (
+          <div className="grid gap-4">
+            {pendingClaims.map((claim) => (
+              <Card key={claim.id}>
+                <CardHeader>
+                  <CardTitle>{claim.title} - RM{claim.totalAmount}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Link href={`/dashboard/claims/treasurer/submitted/${claim.id}`}>
+                    <Button variant="outline">Review Claim</Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section>
+        <h2 className="text-xl font-semibold mb-4">Waiting for Payment</h2>
+        {waitingClaims.length === 0 ? (
+          <p className="text-zinc-500">No claims waiting for payment.</p>
+        ) : (
+          <div className="grid gap-4">
+            {waitingClaims.map((claim) => (
+              <Card key={claim.id}>
+                <CardHeader>
+                  <CardTitle>{claim.title} - RM{claim.totalAmount}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Link href={`/dashboard/claims/treasurer/submitted/${claim.id}`}>
+                    <Button variant="outline">View Detail & Pay</Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
