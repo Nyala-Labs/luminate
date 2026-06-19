@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { claims } from "@/db/schema";
-import { eq, or, inArray } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser, hasRole } from "@/lib/auth/server";

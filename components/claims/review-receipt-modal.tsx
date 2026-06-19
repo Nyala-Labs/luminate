@@ -11,12 +11,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { reviewReceipt } from "@/app/dashboard/claims/actions";
 import { toast } from "sonner";
 
+import { claimReceipts } from '@/db/schema';
+import { InferSelectModel } from 'drizzle-orm';
+
+type ClaimReceipt = InferSelectModel<typeof claimReceipts> & { driveUrl: string };
+
 export function ReviewReceiptModal({
   receipt,
   canReview,
   onClose,
 }: {
-  receipt: any;
+  receipt: ClaimReceipt;
   canReview: boolean;
   onClose: () => void;
 }) {

@@ -5,15 +5,13 @@ import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { submitClaim, getClaimReceipts } from "../actions";
-import { getCurrentUser } from "@/lib/auth/server";
+import { getClaimReceipts } from "../actions";
 import { ReceiptGallery } from "@/components/claims/receipt-gallery";
 import { DeleteClaimButton } from "@/components/claims/delete-claim-button";
 import { SubmitClaimButton } from "@/components/claims/submit-claim-button";
 
 export default async function ClaimDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await getCurrentUser();
   const [claim] = await db.select().from(claims).where(eq(claims.id, id));
   const receipts = await getClaimReceipts(id);
   const [payment] = await db.select().from(claimPayments).where(eq(claimPayments.claimId, id));

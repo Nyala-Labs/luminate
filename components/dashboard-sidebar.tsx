@@ -8,7 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { CurrentUser } from "@/lib/auth/server";
+import { CurrentUser } from "@/lib/auth/types";
 import { cn } from "@/lib/utils";
 import {
   ChevronsLeft,
@@ -20,7 +20,10 @@ import {
   ReceiptText,
   UserCheck,
   ShieldCheck,
+  Radio,
+  Bell,
 } from "lucide-react";
+
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -64,6 +67,8 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       title: "MAIN MENU",
       items: [
         { name: "Dashboard", href: "/dashboard/home", icon: LayoutDashboard },
+        { name: "Pulse", href: "/dashboard/pulse", icon: Radio },
+        { name: "Notifications", href: "/dashboard/pulse/notifications", icon: Bell },
         { name: "Recognition", href: "/dashboard/recognition", icon: Award },
         { name: "Social Blaster", href: "/dashboard/social", icon: Share2 },
         { name: "Claims", href: "/dashboard/claims", icon: ReceiptText },
@@ -140,33 +145,34 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
                       pathname === "/dashboard");
                   const Icon = item.icon;
                   return (
-                    <li key={item.name}>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Link
-                            href={item.href}
-                            className={cn(
-                              "flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full",
-                              isActive
-                                ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                                : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
-                            )}
-                          >
-                            <Icon className="size-5 shrink-0" />
-                            {!isCollapsed && (
-                              <span className="truncate flex-1 text-left">
-                                {item.name}
-                              </span>
-                            )}
-                          </Link>
-                        </TooltipTrigger>
-                        {isCollapsed && (
-                          <TooltipContent side="right">
-                            {item.name}
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
-                    </li>
+                      <li key={item.name}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Link
+                              href={item.href}
+                              className={cn(
+                                "flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full",
+                                isActive
+                                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
+                              )}
+                            >
+                              <Icon className="size-5 shrink-0" />
+                              {!isCollapsed && (
+                                <span className="truncate flex-1 text-left">
+                                  {item.name}
+                                </span>
+                              )}
+                            </Link>
+                          </TooltipTrigger>
+                          {isCollapsed && (
+                            <TooltipContent side="right">
+                              {item.name}
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                      </li>
+
                   );
                 })}
               </ul>
@@ -178,9 +184,10 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       <div className="p-3 border-t border-sidebar-border">
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild={false}>
               <button
                 onClick={handleSignOut}
+                type="button"
                 className={cn(
                   "flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full text-sidebar-foreground/70 hover:bg-rose-500/10 hover:text-rose-500",
                 )}
@@ -195,6 +202,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
               <TooltipContent side="right">Logout</TooltipContent>
             )}
           </Tooltip>
+
         </TooltipProvider>
       </div>
 

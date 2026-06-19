@@ -8,11 +8,11 @@ import { toast } from 'sonner';
 export function SubmitClaimButton({ claimId }: { claimId: string }) {
   const { pending } = useFormStatus();
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async () => {
     try {
       await submitClaim(claimId);
       toast.success("Claim submitted to treasurer successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to submit claim");
     }
   };

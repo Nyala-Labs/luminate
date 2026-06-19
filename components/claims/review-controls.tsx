@@ -4,7 +4,12 @@ import { Button } from "@/components/ui/button";
 import { approveClaim } from "@/app/dashboard/claims/actions";
 import { RejectClaimModal } from "./reject-claim-modal";
 
-export function ReviewControls({ claim, userId }: { claim: any, userId: string }) {
+import { claims } from '@/db/schema';
+import { InferSelectModel } from 'drizzle-orm';
+
+type Claim = InferSelectModel<typeof claims>;
+
+export function ReviewControls({ claim, userId }: { claim: Claim, userId: string }) {
   const [showRejectModal, setShowRejectModal] = useState(false);
 
   return (

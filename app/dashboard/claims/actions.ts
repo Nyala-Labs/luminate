@@ -266,7 +266,7 @@ export async function getClaimReceipts(claimId: string) {
   const accessToken = session?.provider_token;
   
   return Promise.all(receipts.map(async (r) => {
-    let metadata: any = { name: "Receipt" };
+    let metadata: { name?: string, mimeType?: string, thumbnailLink?: string, webViewLink?: string } = { name: "Receipt" };
     if (accessToken) {
       metadata = await getFileMetadata(accessToken, r.driveFileId);
     }

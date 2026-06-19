@@ -31,7 +31,62 @@ export const userRoles = pgTable('user_roles', {
   pk: primaryKey({ columns: [t.userId, t.roleId] }),
 }));
 
-// We'll keep posts for now so we don't break earlier setups, but point the authorId to a uuid
+// --- Pulse Tables ---
+
+export const happeningStatusEnum = pgEnum('happening_status', [
+  'idea', 'exploring', 'pending_decision', 'confirmed', 
+  'active', 'done', 'cancelled', 'archived'
+]);
+
+export const happeningCertaintyEnum = pgEnum('happening_certainty', ['low', 'medium', 'high', 'confirmed']);
+export const happeningVisibilityEnum = pgEnum('happening_visibility', ['public_org', 'team_only', 'leadership', 'finance', 'private']);
+
+export const happenings = pgTable('happenings', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  title: text('title').notNull(),
+  description: text('description'),
+  category: text('category').notNull().default('general'),
+  status: happeningStatusEnum('status').default('idea').notNull(),
+  certainty: happeningCertaintyEnum('certainty').default('low').notNull(),
+  visibility: happeningVisibilityEnum('visibility').default('public_org').notNull(),
+  ownerId: uuid('owner_id').references(() => users.id),
+  createdBy: uuid('created_by').references(() => users.id).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const happeningUpdates = pgTable('happening_updates', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  happeningId: uuid('happening_id').references(() => happenings.id, { onDelete: 'cascade' }).notNull(),
+  authorId: uuid('author_id').references(() => users.id).notNull(),
+  updateType: text('update_type').default('note').notNull(),
+  body: text('body').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const happeningSources = pgTable('happening_sources', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  happeningId: uuid('happening_id').references(() => happenings.id, { onDelete: 'cascade' }).notNull(),
+  sourceType: text('source_type').notNull(),
+  title: text('title'),
+  url: text('url'),
+  addedBy: uuid('added_by').references(() => users.id).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const notificationEvents = pgTable('notification_events', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id).notNull(),
+  happeningId: uuid('happening_id').references(() => happenings.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(),
+  title: text('title').notNull(),
+  body: text('body'),
+  readAt: timestamp('read_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// --- Existing Tables ---
+
 export const posts = pgTable('posts', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),

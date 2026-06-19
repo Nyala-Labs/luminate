@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -63,6 +64,7 @@ export function NewPostForm({
     setExistingMedia((prev) => prev.filter((m) => m.id !== mediaId));
   };
 
+// remove the unused error variable inside handleUpload
   const handleUpload = async () => {
     if (files.length === 0) return;
 
@@ -74,7 +76,7 @@ export function NewPostForm({
       await uploadPostMedia(postId, formData);
       alert("Media uploaded successfully");
       window.location.reload();
-    } catch (error) {
+    } catch {
       alert("Error uploading media");
     } finally {
       setIsUploading(false);
@@ -99,9 +101,11 @@ export function NewPostForm({
               className="relative group rounded-md overflow-hidden bg-zinc-900 border border-zinc-800 p-2 flex flex-col items-center justify-center"
             >
               {media.thumbnailLink ? (
-                <img
+                <Image
                   src={`/api/social/media/${media.driveFileId}`}
-                  alt={media.name}
+                  alt={media.name || "Media"}
+                  width={200}
+                  height={100}
                   className="w-full h-24 object-cover"
                 />
               ) : (
@@ -123,9 +127,11 @@ export function NewPostForm({
               key={index}
               className="relative group rounded-md overflow-hidden"
             >
-              <img
+              <Image
                 src={preview}
                 alt="preview"
+                width={200}
+                height={128}
                 className="w-full h-32 object-cover"
               />
               <button

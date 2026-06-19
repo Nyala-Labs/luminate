@@ -25,21 +25,33 @@ const formSchema = z.object({
   })).min(1, "At least one item is required"),
 });
 
-export function EditClaimForm({ claim, items }: { claim: any, items: any[] }) {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const { register, control, handleSubmit } = useForm<z.infer<typeof formSchema>>({
+import { claims, claimItems } from '@/db/schema';
+import { InferSelectModel } from 'drizzle-orm';
+
+type Claim = InferSelectModel<typeof claims>;
+type ClaimItem = InferSelectModel<typeof claimItems>;
+
+// ...
+export function EditClaimForm({ claim, items }: { claim: Claim, items: ClaimItem[] }) {
+  const {
+    register,
+    handleSubmit,
+    control,
+  } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: claim.title,
-      description: claim.description || '',
+      description: claim.description || "",
       items: items.map(item => ({
         description: item.description,
-        amount: item.amount.toString(),
-        category: item.category as any,
+        amount: item.amount,
+        category: item.category as "Event" | "Miscellaneous" | "Asset" | "Operational",
       })),
     },
   });
+
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const { fields: itemFields, append: appendItem, remove: removeItem } = useFieldArray({
     control,
@@ -70,16 +82,16 @@ export function EditClaimForm({ claim, items }: { claim: any, items: any[] }) {
         <h3 className="text-lg font-semibold">Items</h3>
         {itemFields.map((field, index) => (
           <div key={field.id} className="flex gap-2">
-            <Input placeholder="Description" {...register(`items.${index}.description`)} />
+            <Input placeholder="Description" {...register(`items.${index}.description` as const)} />
             <Input
               placeholder="RM0.00"
               type="number"
               step="0.01"
-              {...register(`items.${index}.amount`)}
+              {...register(`items.${index}.amount` as const)}
             />
             <Controller
               control={control}
-              name={`items.${index}.category`}
+              name={`items.${index}.category` as const}
               render={({ field }) => (
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <SelectTrigger className="w-[180px]">

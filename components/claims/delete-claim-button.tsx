@@ -17,7 +17,7 @@ export function DeleteClaimButton({ claimId }: { claimId: string }) {
       await deleteClaim(claimId);
       toast.success("Claim deleted successfully");
       router.push('/dashboard/claims');
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete claim");
       setLoading(false);
     }

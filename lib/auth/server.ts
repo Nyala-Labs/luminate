@@ -4,17 +4,7 @@ import { users, userRoles, roles } from '@/db/schema';
 import { eq, and, isNull } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
-
-export type CurrentUser = {
-  id: string;
-  email: string;
-  firstname: string | null;
-  lastname: string | null;
-  profilePic: string | null;
-  status: 'PENDING' | 'ACTIVE' | 'REVOKED';
-  lastSignedIn: Date | null;
-  roleTitles: string[];
-};
+import { CurrentUser } from './types';
 
 // Internal function to bypass cache
 async function fetchUserFromDb(): Promise<CurrentUser | null> {

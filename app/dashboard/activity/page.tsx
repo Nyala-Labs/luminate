@@ -1,5 +1,5 @@
 import * as React from "react";
-import { GitCommit, Rocket, ShieldAlert, Award, Star } from "lucide-react";
+import { GitCommit, Rocket, Award, Star } from "lucide-react";
 
 export default function ActivityPage() {
   const activities = [

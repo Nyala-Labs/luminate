@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { users, userRoles, roles } from "@/db/schema";
+import { userRoles, roles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function getUserRole(userId: string) {

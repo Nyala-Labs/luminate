@@ -3,14 +3,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { ReviewReceiptModal } from "./review-receipt-modal";
 
+import { claimReceipts } from '@/db/schema';
+import { InferSelectModel } from 'drizzle-orm';
+
+type ClaimReceipt = InferSelectModel<typeof claimReceipts> & { name: string, status: string };
+
 export function ReceiptGallery({
   receipts,
   canReview,
 }: {
-  receipts: any[];
+  receipts: ClaimReceipt[];
   canReview: boolean;
 }) {
-  const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
+  const [selectedReceipt, setSelectedReceipt] = useState<ClaimReceipt | null>(null);
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -4,7 +4,7 @@ import { Calendar as CalendarIcon, Clock, ChevronLeft, ChevronRight, Plus } from
 export default function CalendarPage() {
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const currentMonthDays = Array.from({ length: 30 }, (_, i) => i + 1);
-  const leadingEmptyDays = Array.from({ length: 1 }, (_, i) => null); // Starts on Mon
+  const leadingEmptyDays = Array.from({ length: 1 }, () => null); // Starts on Mon
 
   const events = [
     { day: 4, title: "Sprint Review", time: "10:00 AM", type: "work" },

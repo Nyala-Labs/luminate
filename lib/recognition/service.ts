@@ -31,12 +31,12 @@ export async function createAward(data: {
   }).returning();
 
   if (!tier.approvalRequired) {
-    await finalizeAward(newAward.id, tier.points);
+    await finalizeAward(newAward.id);
   }
 
   return newAward;
 }
 
-export async function finalizeAward(awardId: string, points: number) {
+export async function finalizeAward() {
   // Logic to update ledger and reputation table
 }

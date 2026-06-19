@@ -7,7 +7,12 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
-export function ExecutiveControls({ claim, userId }: { claim: any, userId: string }) {
+import { claims } from '@/db/schema';
+import { InferSelectModel } from 'drizzle-orm';
+
+type Claim = InferSelectModel<typeof claims>;
+
+export function ExecutiveControls({ claim, userId }: { claim: Claim, userId: string }) {
   const [loading, setLoading] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [reason, setReason] = useState("");

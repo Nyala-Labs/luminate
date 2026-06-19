@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { awards, users } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { TIER_CONFIG } from "@/lib/config/recognition";
+import Image from "next/image";
 
 export async function ContributionGallery() {
   const latestAwards = await db
@@ -44,7 +45,7 @@ export async function ContributionGallery() {
             <div className="flex items-center gap-3">
               <div className="size-8 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-400 overflow-hidden shrink-0">
                 {award.receiverProfilePic ? (
-                  <img src={award.receiverProfilePic} alt="Profile" />
+                  <Image src={award.receiverProfilePic} alt="Profile" width={32} height={32} />
                 ) : (
                   <>
                     {award.receiverFirstname?.[0]}
