@@ -16,7 +16,7 @@ export default async function DigestPage() {
     })
   );
 
-  const digest = generateDigest(happeningsWithUpdates as (Happening & { updates: unknown[] })[], 'weekly');
+  const digest = generateDigest(happeningsWithUpdates as any, 'weekly');
 
   return (
     <div className="p-6 max-w-2xl mx-auto">

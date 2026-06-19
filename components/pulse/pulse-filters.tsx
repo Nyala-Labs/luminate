@@ -35,7 +35,7 @@ export function PulseFilters({ happenings, onFiltered }: PulseFiltersProps) {
         onChange={(e) => { setSearch(e.target.value); handleFilter(e.target.value, category); }}
         className="max-w-xs"
       />
-      <Select onValueChange={(val) => { setCategory(val); handleFilter(search, val); }} defaultValue="all">
+      <Select onValueChange={(val: string | null) => { if (val) { setCategory(val); handleFilter(search, val); } }} defaultValue="all">
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Category" />
         </SelectTrigger>

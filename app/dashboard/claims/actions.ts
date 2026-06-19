@@ -266,9 +266,15 @@ export async function getClaimReceipts(claimId: string) {
   const accessToken = session?.provider_token;
   
   return Promise.all(receipts.map(async (r) => {
-    let metadata: { name?: string, mimeType?: string, thumbnailLink?: string, webViewLink?: string } = { name: "Receipt" };
+    let metadata: { name?: string | undefined, mimeType?: string | undefined, thumbnailLink?: string | undefined, webViewLink?: string | undefined } = { name: "Receipt" };
     if (accessToken) {
-      metadata = await getFileMetadata(accessToken, r.driveFileId);
+      const fetched = await getFileMetadata(accessToken, r.driveFileId);
+      metadata = {
+        name: fetched.name ?? undefined,
+        mimeType: fetched.mimeType ?? undefined,
+        thumbnailLink: fetched.thumbnailLink ?? undefined,
+        webViewLink: fetched.webViewLink ?? undefined
+      };
     }
     
     return { 

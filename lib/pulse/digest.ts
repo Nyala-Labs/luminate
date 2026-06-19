@@ -6,7 +6,7 @@ interface HappeningUpdate {
   body: string;
 }
 
-export function generateDigest(happenings: (Happening & { updates?: HappeningUpdate[] })[], type: 'daily' | 'weekly' | 'leadership') {
+export function generateDigest(happenings: any[], type: 'daily' | 'weekly' | 'leadership') {
   const urgent = happenings.filter(h => h.attentionLevel === 'urgent');
   const attention = happenings.filter(h => h.attentionLevel === 'attention');
   const active = happenings.filter(h => h.status === 'active');

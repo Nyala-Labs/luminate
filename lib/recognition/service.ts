@@ -37,6 +37,6 @@ export async function createAward(data: {
   return newAward;
 }
 
-export async function finalizeAward() {
+export async function finalizeAward(awardId: string) {
   // Logic to update ledger and reputation table
 }
